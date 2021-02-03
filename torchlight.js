@@ -714,7 +714,7 @@ Hooks.once("init", () => {
 		default: true,
 		type: Boolean
 	});
-
+    //Initializing checkAvailability für dnd5e and others
 	if (game.system.id === 'dnd5e') {
 		game.settings.register("torchlight", "checkAvailability", {
 			name: game.i18n.localize("torchlight.checkAvailability.name"),
@@ -724,15 +724,27 @@ Hooks.once("init", () => {
 			default: true,
 			type: Boolean
 		});
-		game.settings.register("torchlight", "dmAsPlayer", {
+	}
+	else{
+		game.settings.register("torchlight", "checkAvailability", {
+			name: game.i18n.localize("torchlight.checkAvailability.name"),
+			hint: game.i18n.localize("torchlight.checkAvailability.hint"),
+			scope: "world",
+			config: false,
+			default: true,
+			type: Boolean
+		});
+	};
+	//Initializing dmAsPlayer for all settings
+	game.settings.register("torchlight", "dmAsPlayer", {
 			name: game.i18n.localize("torchlight.dmAsPlayer.name"),
 			hint: game.i18n.localize("torchlight.dmAsPlayer.hint"),
 			scope: "world",
 			config: true,
 			default: false,
 			type: Boolean
-		});
-	}
+	});
+	
 
 	// Light Parameters
 	game.settings.register("torchlight", "lightBrightRadius", {
