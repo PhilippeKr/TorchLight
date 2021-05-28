@@ -507,8 +507,6 @@ class TorchLight {
 			let hasItem = false;
 			actor.data.items.forEach(item => {
 				if (item.name.toLowerCase() === itemToCheck.toLowerCase()) {
-					console.log(item.name);
-					console.log(item);
 					if (item.data.quantity > 0 && game.system.id === 'dnd5e')
 						hasItem = true;
 					if (item.data.quantity.value > 0 && game.system.id === 'ose')
