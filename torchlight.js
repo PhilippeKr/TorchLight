@@ -151,7 +151,7 @@ class TorchLight {
 						// The token does not have the lantern on
 						console.log("Clicked on the lantern when the lantern is off.");
 						// Checks whether the character can consume an oil flask
-						if (consumeItem("Oil (flask)")) {
+						if (consumeItem(game.settings.get("torchlight", "nameConsumableLantern"))) {
 							statusLantern = true;
 							await app.object.setFlag("torchlight", "statusLantern", true);
 							tbuttonLantern.addClass("active");
@@ -210,7 +210,7 @@ class TorchLight {
 							ChatMessage.create({
 								user: game.user._id,
 								speaker: game.actors.get(data.actorId),
-								content: "No Oil (flask) in Inventory !"
+								content: "No " + game.settings.get("torchlight", "nameConsumableLantern") + " in Inventory !"
 							});
 							disableTorchlightButton(tbuttonLantern);
 						}
@@ -321,7 +321,7 @@ class TorchLight {
 		function enableRelevantButtons() {
 
 			// Stores if checks need to be made to enable buttons
-			let noCheck = game.system.id !== 'dnd5e';
+			let noCheck = game.system.id !== 'dnd5e' && game.system.id !== 'ose';
 			if (!noCheck)
 				noCheck = (data.isGM && !game.settings.get("torchlight", "dmAsPlayer")) || !game.settings.get("torchlight", "checkAvailability");
 
@@ -330,12 +330,12 @@ class TorchLight {
 			else
 				disableTorchlightButton(tbuttonLight);
 
-			if (noCheck || (hasItemInInventory("Oil (flask)") && (hasItemInInventory("Lantern, Hooded") || hasItemInInventory("Lantern, Bullseye"))))
+			if (noCheck || (hasItemInInventory(game.settings.get("torchlight", "nameConsumableLantern")) && (hasItemInInventory("Lantern") || hasItemInInventory("Lantern, Hooded") || hasItemInInventory("Lantern, Bullseye"))))
 				enableTorchlightButton(tbuttonLantern);
 			else
 				disableTorchlightButton(tbuttonLantern);
 
-			if (noCheck || hasItemInInventory("Torch"))
+			if (noCheck || hasItemInInventory(game.settings.get("torchlight", "nameConsumableTorch")))
 				enableTorchlightButton(tbuttonTorch);
 			else
 				disableTorchlightButton(tbuttonTorch);
@@ -507,7 +507,11 @@ class TorchLight {
 			let hasItem = false;
 			actor.data.items.forEach(item => {
 				if (item.name.toLowerCase() === itemToCheck.toLowerCase()) {
-					if (item.data.quantity > 0)
+					console.log(item.name);
+					console.log(item);
+					if (item.data.quantity > 0 && game.system.id === 'dnd5e')
+						hasItem = true;
+					if (item.data.quantity.value > 0 && game.system.id === 'ose')
 						hasItem = true;
 				}
 			});
@@ -517,7 +521,7 @@ class TorchLight {
 		// Returns true if either the character does not need to consume an item
 		// or if he can indeed consume it (and it is actually consumed)
 		function consumeItem(itemToCheck) {
-			let consume = game.system.id !== 'dnd5e';
+			let consume = game.system.id !== 'dnd5e' && game.system.id !== 'ose';
 			if (!consume)
 				consume = (data.isGM && !game.settings.get("torchlight", "dmAsPlayer")) ||
 								!game.settings.get("torchlight", "checkAvailability") ||
@@ -529,9 +533,12 @@ class TorchLight {
 				let hasItem = false;
 				actor.data.items.forEach((item, offset) => {
 					if (item.name.toLowerCase() === itemToCheck.toLowerCase()) {
-						if (item.data.quantity > 0) {
+						if (item.data.quantity > 0 && game.system.id === 'dnd5e') {
 							hasItem = true;
 							actor.updateOwnedItem({"_id": actor.data.items[offset]._id, "data.quantity": actor.data.items[offset].data.quantity - 1});
+						} else if (item.data.quantity.value > 0 && game.system.id === 'ose') {
+							hasItem = true;
+							actor.updateOwnedItem({"_id": actor.data.items[offset]._id, "data.quantity.value": actor.data.items[offset].data.quantity.value - 1});
 						}
 					}
 				});
@@ -633,7 +640,7 @@ Hooks.once("init", () => {
 		type: Boolean
 	});
 
-	if (game.system.id === 'dnd5e') {
+	if (game.system.id === 'dnd5e' || game.system.id === 'ose') {
 		game.settings.register("torchlight", "checkAvailability", {
 			name: game.i18n.localize("torchlight.checkAvailability.name"),
 			hint: game.i18n.localize("torchlight.checkAvailability.hint"),
@@ -913,6 +920,15 @@ Hooks.once("init", () => {
 			default: "Oil (flask)",
 			type: String
 		});
+	} else if (game.system.id === 'ose') {
+		game.settings.register("torchlight", "nameConsumableLantern", {
+			name: game.i18n.localize("torchlight.nameConsumableLantern.name"),
+			hint: game.i18n.localize("torchlight.nameConsumableLantern.hint"),
+			scope: "world",
+			config: true,
+			default: "Oil flask",
+			type: String
+		});
 	}
 
 	// Torch Parameters
@@ -1032,7 +1048,7 @@ Hooks.once("init", () => {
 	});
 
 
-	if (game.system.id === 'dnd5e') {
+	if (game.system.id === 'dnd5e' || game.system.id === 'ose') {
 		game.settings.register("torchlight", "nameConsumableTorch", {
 			name: game.i18n.localize("torchlight.nameConsumableTorch.name"),
 			hint: game.i18n.localize("torchlight.nameConsumableTorch.hint"),
