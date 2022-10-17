@@ -370,16 +370,15 @@ class TorchLight {
 		// Store the initial status of illumination for the token to restore if all light sources are extinguished
 		async function storeTokenLighting() {
 			let promises = [];
-      const tokenData = app.object.data;
-			promises.push(app.object.document.setFlag("torchlight", "InitialBrightRadius", tokenData.light.bright));
-			promises.push(app.object.document.setFlag("torchlight", "InitialDimRadius", tokenData.light.dim));
+			promises.push(app.object.document.setFlag("torchlight", "InitialBrightRadius", app.object.document.light.bright));
+			promises.push(app.object.document.setFlag("torchlight", "InitialDimRadius", app.object.document.light.dim));
 			promises.push(app.object.document.setFlag("torchlight", "InitialLightColor",
-				tokenData.lightColor ? tokenData.lightColor.toString(16).padStart(6, 0) : null));
-			promises.push(app.object.document.setFlag("torchlight", "InitialColorIntensity", Math.sqrt(tokenData.light.alpha)));
-			promises.push(app.object.document.setFlag("torchlight", "InitialLightAngle", tokenData.light.angle));
-			promises.push(app.object.document.setFlag("torchlight", "InitialAnimationType", tokenData.light.animation.type ?? null));
-			promises.push(app.object.document.setFlag("torchlight", "InitialAnimationSpeed", tokenData.light.animation.speed));
-			promises.push(app.object.document.setFlag("torchlight", "InitialAnimationIntensity", tokenData.light.animation.intensity));
+				app.object.document.lightColor ? app.object.document.lightColor.toString(16).padStart(6, 0) : null));
+			promises.push(app.object.document.setFlag("torchlight", "InitialColorIntensity", Math.sqrt(app.object.document.light.alpha)));
+			promises.push(app.object.document.setFlag("torchlight", "InitialLightAngle", app.object.document.light.angle));
+			promises.push(app.object.document.setFlag("torchlight", "InitialAnimationType", app.object.document.light.animation.type ?? null));
+			promises.push(app.object.document.setFlag("torchlight", "InitialAnimationSpeed", app.object.document.light.animation.speed));
+			promises.push(app.object.document.setFlag("torchlight", "InitialAnimationIntensity", app.object.document.light.animation.intensity));
 			return Promise.all(promises);
 		}
 
