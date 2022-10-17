@@ -370,28 +370,15 @@ class TorchLight {
 		// Store the initial status of illumination for the token to restore if all light sources are extinguished
 		async function storeTokenLighting() {
 			let promises = [];
-			const tokenData = app.object.data;
-			promises.push(app.object.document.setFlag("torchlight", "InitialBrightRadius", tokenData.brightLight));
-			promises.push(app.object.document.setFlag("torchlight", "InitialDimRadius", tokenData.dimLight));
+			promises.push(app.object.document.setFlag("torchlight", "InitialBrightRadius", app.object.document.light.bright));
+			promises.push(app.object.document.setFlag("torchlight", "InitialDimRadius", app.object.document.light.dim));
 			promises.push(app.object.document.setFlag("torchlight", "InitialLightColor",
-				tokenData.lightColor ? tokenData.lightColor.toString(16).padStart(6, 0) : null));
-			promises.push(app.object.document.setFlag("torchlight", "InitialColorIntensity", Math.sqrt(tokenData.lightAlpha)));
-			promises.push(app.object.document.setFlag("torchlight", "InitialLightAngle", tokenData.lightAngle));
-			promises.push(app.object.document.setFlag("torchlight", "InitialAnimationType", tokenData.lightAnimation.type ?? null));
-			promises.push(app.object.document.setFlag("torchlight", "InitialAnimationSpeed", tokenData.lightAnimation.speed));
-			promises.push(app.object.document.setFlag("torchlight", "InitialAnimationIntensity", tokenData.lightAnimation.intensity));
-
-			/*
-			Promise.all(promises).then(_ => {
-				console.log("Stored brightRadius:" + app.object.document.getFlag("torchlight", "InitialBrightRadius"));
-				console.log("Stored dimRadius:" + app.object.document.getFlag("torchlight", "InitialDimRadius"));
-				console.log("Stored lightColor:" + app.object.document.getFlag("torchlight", "InitialLightColor"));
-				console.log("Stored lightAlpha:" + app.object.document.getFlag("torchlight", "InitialColorIntensity"));
-				console.log("Stored lightAngle:" + app.object.document.getFlag("torchlight", "InitialLightAngle"));
-				console.log("Stored animation.type:" + app.object.document.getFlag("torchlight", "InitialAnimationType"));
-				console.log("Stored animation.speed:" + app.object.document.getFlag("torchlight", "InitialAnimationSpeed"));
-				console.log("Stored animation.intensity:" + app.object.document.getFlag("torchlight", "InitialAnimationIntensity"));
-			});*/
+				app.object.document.lightColor ? app.object.document.lightColor.toString(16).padStart(6, 0) : null));
+			promises.push(app.object.document.setFlag("torchlight", "InitialColorIntensity", Math.sqrt(app.object.document.light.alpha)));
+			promises.push(app.object.document.setFlag("torchlight", "InitialLightAngle", app.object.document.light.angle));
+			promises.push(app.object.document.setFlag("torchlight", "InitialAnimationType", app.object.document.light.animation.type ?? null));
+			promises.push(app.object.document.setFlag("torchlight", "InitialAnimationSpeed", app.object.document.light.animation.speed));
+			promises.push(app.object.document.setFlag("torchlight", "InitialAnimationIntensity", app.object.document.light.animation.intensity));
 			return Promise.all(promises);
 		}
 
